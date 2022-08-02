@@ -1,13 +1,20 @@
 import React, { useLayoutEffect } from 'react';
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { ChatRoomProps, useAppNavigation } from '../types';
-import { ScrollView } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Chat = ({ route }: ChatRoomProps) => {
   const nav = useAppNavigation();
 
-  const { name, avatarUrl } = route.params;
+  const { name, avatarUrl, messages } = route.params;
 
   useLayoutEffect(() => {
     nav.setOptions({
@@ -32,29 +39,29 @@ const Chat = ({ route }: ChatRoomProps) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView
+      <FlatList
         contentContainerStyle={{
           flexGrow: 1,
           justifyContent: 'flex-start',
           flexDirection: 'column-reverse',
         }}
-      >
-        <View style={styles.myMessage}>
-          <Text style={{ color: 'white' }}>Message1</Text>
-        </View>
-        <View style={styles.senderMessage}>
-          <Text>Message2</Text>
-        </View>
-        <View style={styles.myMessage}>
-          <Text style={{ color: 'white' }}>Message1</Text>
-        </View>
-        <View style={styles.myMessage}>
-          <Text style={{ color: 'white' }}>Message1</Text>
-        </View>
-        <View style={styles.myMessage}>
-          <Text style={{ color: 'white' }}>Message1</Text>
-        </View>
-      </ScrollView>
+        data={messages}
+        renderItem={({ item }) => {
+          if (item.userId === 'PHiQ1KNx8HRXyoaoo60e94AaKlE2') {
+            return (
+              <View style={styles.myMessage}>
+                <Text style={{ color: 'white' }}>{item.message}</Text>
+              </View>
+            );
+          } else {
+            return (
+              <View style={styles.senderMessage}>
+                <Text>{item.message}</Text>
+              </View>
+            );
+          }
+        }}
+      />
 
       <View style={styles.newMessageContainer}>
         <TextInput

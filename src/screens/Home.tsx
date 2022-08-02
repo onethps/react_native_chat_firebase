@@ -1,28 +1,54 @@
-import React from 'react';
-import { SafeAreaView } from 'react-navigation';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import ChatRowItem from '../components/ChatRowItem';
+import React, { useEffect, useState } from 'react';
+import { FlatList, StyleSheet, TextInput, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { useAppNavigation } from '../types';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { db } from '../api/firebase';
+import ChatRowItem from '../components/ChatRowItem';
+
+export type MessagesType = {
+  createdAt: string;
+  message: string;
+  userId: string;
+};
+
+export type RoomType = {
+  createdAt: string;
+  messages: MessagesType[];
+  users: number[];
+  roomName: string;
+};
 
 const Home = () => {
+  const [room, setRoom] = useState<RoomType[] | null>(null);
+
+  useEffect(() => {
+    const q = query(
+      collection(db, 'chat'),
+      where(`users1.PHiQ1KNx8HRXyoaoo60e94AaKlE2`, '==', true),
+    );
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      let rooms: RoomType[] = [];
+      querySnapshot.forEach((doc) => {
+        rooms.push(doc.data() as RoomType);
+      });
+      setRoom(rooms);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <View style={styles.container}>
-      <View>
+      <View style={styles.inputContainer}>
         <TextInput style={styles.input} placeholder={'Search...'} />
       </View>
-      <ScrollView style={styles.chatRows}>
-        <ChatRowItem />
-        <ChatRowItem />
-        <ChatRowItem />
-        <ChatRowItem />
-        <ChatRowItem />
-        <ChatRowItem />
-        <ChatRowItem />
-        <ChatRowItem />
-        <ChatRowItem />
-        <ChatRowItem />
-      </ScrollView>
+      <FlatList
+        contentContainerStyle={styles.chatRows}
+        data={room}
+        renderItem={({ item }) => <ChatRowItem item={item} />}
+        keyExtractor={(item, index) => item.roomName + Math.floor(Math.random() * 100)}
+      />
     </View>
   );
 };
@@ -30,8 +56,13 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
+  },
+  inputContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: 'white',
+    borderBottomWidth: 0.7,
+    borderBottomColor: '#e0e0e0',
   },
   input: {
     width: '100%',

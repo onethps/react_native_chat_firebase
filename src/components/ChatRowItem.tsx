@@ -8,19 +8,22 @@ import {
   View,
 } from 'react-native';
 import { useAppNavigation } from '../types';
+import { RoomType } from '../screens/Home';
+import { format } from 'timeago.js';
 
 const { height, width } = Dimensions.get('screen');
 
 const HEIGHT = height;
 const WIDTH = width;
 
-const ChatRowItem = () => {
+const ChatRowItem = ({ item }: { item: RoomType }) => {
   const nav = useAppNavigation();
   return (
     <TouchableOpacity
       onPress={() =>
         nav.navigate('Chat', {
-          name: 'Viktor',
+          name: item.roomName,
+          messages: item.messages,
           avatarUrl:
             'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/8a/8a702a7ab089d1934368702287381b9eb20798e6_full.jpg',
         })
@@ -37,8 +40,8 @@ const ChatRowItem = () => {
         </View>
         <View style={styles.textContainer}>
           <View style={styles.headerTextContainer}>
-            <Text style={styles.name}>Viktor</Text>
-            <Text style={{ color: '#9a9a9a' }}>10:30</Text>
+            <Text style={styles.name}>{item.roomName}</Text>
+            <Text style={{ color: '#9a9a9a' }}>10 30</Text>
           </View>
           <Text numberOfLines={2} style={styles.desc}>
             Lorem ipsum dolor sit amet, consectetur adipisicing elit. Alias cum dolore
