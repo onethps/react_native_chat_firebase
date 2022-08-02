@@ -19,7 +19,7 @@ const ChatRowItem = () => {
   return (
     <TouchableOpacity
       onPress={() =>
-        nav.navigate('ChatRoom', {
+        nav.navigate('Chat', {
           name: 'Viktor',
           avatarUrl:
             'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/8a/8a702a7ab089d1934368702287381b9eb20798e6_full.jpg',

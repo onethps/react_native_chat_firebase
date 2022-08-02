@@ -1,16 +1,16 @@
-import React, { useLayoutEffect, useRef } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, TextInput } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import React, { useLayoutEffect } from 'react';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ChatRoomProps, useAppNavigation } from '../types';
+import { ScrollView } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const ChatRoom = ({ route }: ChatRoomProps) => {
-  const navigation = useAppNavigation();
+const Chat = ({ route }: ChatRoomProps) => {
+  const nav = useAppNavigation();
 
   const { name, avatarUrl } = route.params;
 
   useLayoutEffect(() => {
-    navigation.setOptions({
+    nav.setOptions({
       headerTitle: name,
       headerTitleAlign: 'center',
       headerRight: () => (
@@ -115,4 +115,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChatRoom;
+export default Chat;
