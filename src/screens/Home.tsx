@@ -46,7 +46,9 @@ const Home = () => {
       <FlatList
         contentContainerStyle={styles.chatRows}
         data={room}
-        renderItem={({ item }) => <ChatRowItem item={item} />}
+        renderItem={({ item, index }) => (
+          <ChatRowItem item={item} message={item.messages[index].message} />
+        )}
         keyExtractor={(item, index) => item.roomName + Math.floor(Math.random() * 100)}
       />
     </View>

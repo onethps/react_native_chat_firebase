@@ -16,7 +16,7 @@ const { height, width } = Dimensions.get('screen');
 const HEIGHT = height;
 const WIDTH = width;
 
-const ChatRowItem = ({ item }: { item: RoomType }) => {
+const ChatRowItem = ({ item, message }: { item: RoomType; message: any }) => {
   const nav = useAppNavigation();
   return (
     <TouchableOpacity
@@ -44,8 +44,7 @@ const ChatRowItem = ({ item }: { item: RoomType }) => {
             <Text style={{ color: '#9a9a9a' }}>10 30</Text>
           </View>
           <Text numberOfLines={2} style={styles.desc}>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Alias cum dolore
-            dolores ea, eaquessssssssss
+            {message}
           </Text>
         </View>
       </View>
@@ -65,7 +64,7 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     paddingHorizontal: 10,
-    width: WIDTH - 40 - 50,
+    flex: 2,
     paddingVertical: 5,
     borderBottomColor: '#ececec',
     borderBottomWidth: 1,

@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import {
   FlatList,
   Image,
@@ -15,6 +15,8 @@ const Chat = ({ route }: ChatRoomProps) => {
   const nav = useAppNavigation();
 
   const { name, avatarUrl, messages } = route.params;
+
+  const flatListRef = useRef<FlatList>(null);
 
   useLayoutEffect(() => {
     nav.setOptions({
@@ -40,10 +42,14 @@ const Chat = ({ route }: ChatRoomProps) => {
   return (
     <View style={styles.container}>
       <FlatList
+        ref={flatListRef}
         contentContainerStyle={{
           flexGrow: 1,
           justifyContent: 'flex-start',
           flexDirection: 'column-reverse',
+        }}
+        onLayout={() => {
+          flatListRef.current?.scrollToEnd({ animated: true });
         }}
         data={messages}
         renderItem={({ item }) => {
