@@ -2,23 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { FlatList, StyleSheet, TextInput, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { db } from '../api/firebase';
-import ChatRowItem from '../components/ChatRowItem';
 
-export type MessagesType = {
-  createdAt: string;
-  message: string;
-  userId: string;
-};
+import { RoomType } from '../../types';
+import ChatRowItem from '../../components/ChatRowItem/ChatRowItem';
+import { db } from "../../api";
 
-export type RoomType = {
-  createdAt: string;
-  messages: MessagesType[];
-  users: number[];
-  roomName: string;
-};
-
-const Home = () => {
+const HomeScreen = () => {
   const [room, setRoom] = useState<RoomType[] | null>(null);
 
   useEffect(() => {
@@ -78,4 +67,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Home;
+export default HomeScreen;

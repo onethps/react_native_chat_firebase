@@ -1,11 +1,9 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { FlatList, View, Text, TextInput, StyleSheet, Image } from 'react-native';
-import { collection, doc, onSnapshot, query, where } from 'firebase/firestore';
-import { db } from '../api/firebase';
-import { RoomType } from './Home';
-import { useAppNavigation } from '../types';
+import React, { useEffect, useState } from 'react';
+import { FlatList, Image, StyleSheet, Text, TextInput, View } from 'react-native';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { db } from '../../api';
 
-const Users = () => {
+const UserListScreen = () => {
   const [allUsers, setAllUsers] = useState<any[] | null>(null);
 
   useEffect(() => {
@@ -102,4 +100,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Users;
+export default UserListScreen;

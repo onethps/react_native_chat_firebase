@@ -8,10 +8,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { ChatRoomProps, useAppNavigation } from '../types';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { ChatRoomProps, useAppNavigation } from "../../types";
 
-const Chat = ({ route }: ChatRoomProps) => {
+const ChatScreen = ({ route }: ChatRoomProps) => {
   const nav = useAppNavigation();
 
   const { name, avatarUrl, messages } = route.params;
@@ -128,4 +128,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Chat;
+export default ChatScreen;

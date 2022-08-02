@@ -7,10 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useAppNavigation } from '../types';
-import { RoomType } from '../screens/Home';
-import { format } from 'timeago.js';
-
+import { RoomType, useAppNavigation } from '../../types';
 const { height, width } = Dimensions.get('screen');
 
 const HEIGHT = height;
@@ -18,17 +15,18 @@ const WIDTH = width;
 
 const ChatRowItem = ({ item, message }: { item: RoomType; message: any }) => {
   const nav = useAppNavigation();
+
+  const onNavToChatRoomPress = () => {
+    nav.navigate('Chat', {
+      name: item.roomName,
+      messages: item.messages,
+      avatarUrl:
+        'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/8a/8a702a7ab089d1934368702287381b9eb20798e6_full.jpg',
+    });
+  };
+
   return (
-    <TouchableOpacity
-      onPress={() =>
-        nav.navigate('Chat', {
-          name: item.roomName,
-          messages: item.messages,
-          avatarUrl:
-            'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/8a/8a702a7ab089d1934368702287381b9eb20798e6_full.jpg',
-        })
-      }
-    >
+    <TouchableOpacity onPress={onNavToChatRoomPress}>
       <View style={styles.container}>
         <View>
           <Image

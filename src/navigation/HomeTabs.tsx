@@ -1,16 +1,16 @@
 import React from 'react';
-import Home from '../screens/Home';
-import Users from '../screens/Users';
+import HomeScreen from '../screens/HomeScreen/HomeScreen';
+import UserListScreen from '../screens/UserListScreen/UserListScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const Tab = createBottomTabNavigator();
 
-const HomeTabs = () => {
+export const HomeTabs = () => {
   return (
     <Tab.Navigator>
       <Tab.Screen
         name={'Chats'}
-        component={Home}
+        component={HomeScreen}
         options={{
           headerTitleAlign: 'center',
           headerShadowVisible: false,
@@ -18,16 +18,14 @@ const HomeTabs = () => {
         }}
       />
       <Tab.Screen
-        name={'Users'}
-        component={Users}
+        name={'UserListScreen'}
+        component={UserListScreen}
         options={{
           headerTitleAlign: 'center',
-          headerTitle: 'Users',
+          headerTitle: 'UserListScreen',
           headerStatusBarHeight: 1,
         }}
       />
     </Tab.Navigator>
   );
 };
-
-export default HomeTabs;
