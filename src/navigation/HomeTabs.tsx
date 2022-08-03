@@ -7,7 +7,11 @@ const Tab = createBottomTabNavigator();
 
 export const HomeTabs = () => {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={{
+        tabBarHideOnKeyboard: true,
+      }}
+    >
       <Tab.Screen
         name={'Chats'}
         component={HomeScreen}

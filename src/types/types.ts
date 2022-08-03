@@ -3,11 +3,12 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type RootStackParamList = {
   Home: undefined;
-  Chat: { name: string; avatarUrl: string; messages: MessagesType[] };
-  Register: undefined;
+  ChatScreen: { name: string; avatarUrl: string; messages: MessagesType[] };
+  SignUpScreen: undefined;
+  SignInScreen: undefined;
 };
 
-export type ChatRoomProps = NativeStackScreenProps<RootStackParamList, 'Chat'>;
+export type ChatRoomProps = NativeStackScreenProps<RootStackParamList, 'ChatScreen'>;
 
 export type NavigationUseType = NavigationProp<RootStackParamList>;
 export const useAppNavigation = () => useNavigation<NavigationUseType>();

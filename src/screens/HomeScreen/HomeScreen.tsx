@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { FlatList, StyleSheet, TextInput, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 
 import { RoomType } from '../../types';
-import ChatRowItem from '../../components/ChatRowItem/ChatRowItem';
-import { db } from "../../api";
+import { db } from '../../api';
+import ChatRowItem from '../../components/ChatRowItem';
 
 const HomeScreen = () => {
   const [room, setRoom] = useState<RoomType[] | null>(null);

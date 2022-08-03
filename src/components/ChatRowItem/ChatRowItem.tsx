@@ -17,7 +17,7 @@ const ChatRowItem = ({ item, message }: { item: RoomType; message: any }) => {
   const nav = useAppNavigation();
 
   const onNavToChatRoomPress = () => {
-    nav.navigate('Chat', {
+    nav.navigate('ChatScreen', {
       name: item.roomName,
       messages: item.messages,
       avatarUrl:
@@ -28,12 +28,12 @@ const ChatRowItem = ({ item, message }: { item: RoomType; message: any }) => {
   return (
     <TouchableOpacity onPress={onNavToChatRoomPress}>
       <View style={styles.container}>
-        <View>
+        <View style={styles.circle}>
           <Image
-            style={styles.avatar}
             source={{
               uri: 'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/8a/8a702a7ab089d1934368702287381b9eb20798e6_full.jpg',
             }}
+            style={styles.avatar}
           />
         </View>
         <View style={styles.textContainer}>
@@ -55,10 +55,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  circle: {},
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 100,
+    flex: 1,
+    borderRadius: 50,
+    width: '40%',
+    aspectRatio: 1,
   },
   textContainer: {
     paddingHorizontal: 10,

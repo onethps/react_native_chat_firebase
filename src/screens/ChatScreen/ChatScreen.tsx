@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import {
+  Dimensions,
   FlatList,
   Image,
   StyleSheet,
@@ -9,10 +10,17 @@ import {
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { ChatRoomProps, useAppNavigation } from "../../types";
+import { ChatRoomProps, useAppNavigation } from '../../types';
+import useKeyboard from '../../utils/useKeyboard';
+
+const { height, width } = Dimensions.get('screen');
+
+const HEIGHT = height;
+const WIDTH = width;
 
 const ChatScreen = ({ route }: ChatRoomProps) => {
   const nav = useAppNavigation();
+  const isKeyboardOpen = useKeyboard();
 
   const { name, avatarUrl, messages } = route.params;
 
@@ -40,7 +48,7 @@ const ChatScreen = ({ route }: ChatRoomProps) => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1 }}>
       <FlatList
         ref={flatListRef}
         contentContainerStyle={{
@@ -68,7 +76,6 @@ const ChatScreen = ({ route }: ChatRoomProps) => {
           }
         }}
       />
-
       <View style={styles.newMessageContainer}>
         <TextInput
           multiline={true}

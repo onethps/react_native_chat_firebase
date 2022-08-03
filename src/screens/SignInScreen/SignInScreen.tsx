@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Dimensions,
@@ -10,6 +10,10 @@ import {
 import { useForm } from 'react-hook-form';
 import CustomInput from '../../components/CustomInput';
 import { useAppNavigation } from '../../types';
+import firebase from 'firebase/compat';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, updateDoc } from 'firebase/firestore';
+import { auth, db } from '../../api';
 
 const { height, width } = Dimensions.get('screen');
 
@@ -18,19 +22,35 @@ const WIDTH = width;
 
 const SignInScreen = () => {
   const nav = useAppNavigation();
+  const [error, setError] = useState(null);
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      email: 'test221232@mail.ru',
+      password: 'test498498',
+    },
+  });
 
   const onSignUpPress = () => {
-    nav.navigate('Register');
+    nav.navigate('SignUpScreen');
+    setError(null);
   };
 
-  const onSignInPress = (data: any) => {
-    console.log(data);
+  const onSignInPress = async (data: any) => {
+    setError(null);
+    try {
+      await signInWithEmailAndPassword(auth, data.email, data.password);
+      if (auth.currentUser)
+        await updateDoc(doc(db, 'users', auth.currentUser?.uid), {
+          isOnline: true,
+        });
+    } catch (e) {
+      setError(e.message);
+    }
   };
 
   return (
@@ -47,7 +67,7 @@ const SignInScreen = () => {
         rules={{ required: 'Username is required' }}
       />
       <CustomInput
-        secureTextEntry={false}
+        secureTextEntry={true}
         name="password"
         placeholder="password"
         control={control}
@@ -57,12 +77,13 @@ const SignInScreen = () => {
         <Button
           onPress={handleSubmit(onSignInPress)}
           color={'#212121'}
-          title={'SignInScreen'}
+          title={'Sign In'}
         />
       </TouchableOpacity>
       <Text style={styles.linkStyle} onPress={onSignUpPress}>
         Dont Have Account
       </Text>
+      {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
 };
@@ -90,6 +111,11 @@ const styles = StyleSheet.create({
     color: 'blue',
     textAlign: 'center',
     marginTop: 20,
+  },
+  errorText: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: 'red',
   },
 });
 
