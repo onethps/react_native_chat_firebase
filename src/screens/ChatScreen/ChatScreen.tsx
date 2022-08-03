@@ -3,6 +3,9 @@ import {
   Dimensions,
   FlatList,
   Image,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
@@ -12,6 +15,7 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ChatRoomProps, useAppNavigation } from '../../types';
 import useKeyboard from '../../utils/useKeyboard';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const { height, width } = Dimensions.get('screen');
 
@@ -48,16 +52,12 @@ const ChatScreen = ({ route }: ChatRoomProps) => {
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       <FlatList
         ref={flatListRef}
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: 'flex-start',
-          flexDirection: 'column-reverse',
-        }}
+        inverted
         onLayout={() => {
-          flatListRef.current?.scrollToEnd({ animated: true });
+          flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
         }}
         data={messages}
         renderItem={({ item }) => {
