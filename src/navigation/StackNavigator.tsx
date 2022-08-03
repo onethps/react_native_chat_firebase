@@ -6,7 +6,6 @@ import { auth } from '../api';
 import ChatRoomScreen from '../screens/ChatRoomScreen';
 import SignInScreen from '../screens/SignInScreen';
 import SignUpScreen from '../screens/SignUpScreen';
-import { Text } from 'react-native';
 
 const HomeStack = createNativeStackNavigator();
 
