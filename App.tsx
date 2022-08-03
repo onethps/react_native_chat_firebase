@@ -1,5 +1,5 @@
 import { NavigationContainer } from '@react-navigation/native';
-import { StackNavigator } from './src/navigation/StackNavigator';
+import { StackNavigator } from './src/navigation';
 
 export default function App() {
   return (
@@ -8,4 +8,3 @@ export default function App() {
     </NavigationContainer>
   );
 }
-

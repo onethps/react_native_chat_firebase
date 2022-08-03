@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { onAuthStateChanged } from 'firebase/auth';
 import { HomeTabs } from '.';
 import { auth } from '../api';
-import ChatScreen from '../screens/ChatScreen';
+import ChatRoomScreen from '../screens/ChatRoomScreen';
 import SignInScreen from '../screens/SignInScreen';
 import SignUpScreen from '../screens/SignUpScreen';
 import { Text } from 'react-native';
@@ -32,7 +32,7 @@ export const StackNavigator = () => {
               headerShown: false,
             }}
           />
-          <HomeStack.Screen name={'ChatScreen'} component={ChatScreen} options={{}} />
+          <HomeStack.Screen name={'ChatRoomScreen'} component={ChatRoomScreen} />
         </>
       ) : (
         <>

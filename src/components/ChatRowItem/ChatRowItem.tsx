@@ -17,7 +17,7 @@ const ChatRowItem = ({ item, message }: { item: RoomType; message: any }) => {
   const nav = useAppNavigation();
 
   const onNavToChatRoomPress = () => {
-    nav.navigate('ChatScreen', {
+    nav.navigate('ChatRoomScreen', {
       name: item.roomName,
       messages: item.messages,
       avatarUrl:

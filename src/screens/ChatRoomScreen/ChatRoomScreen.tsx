@@ -3,9 +3,6 @@ import {
   Dimensions,
   FlatList,
   Image,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
@@ -14,17 +11,15 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ChatRoomProps, useAppNavigation } from '../../types';
-import useKeyboard from '../../utils/useKeyboard';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import ChatMessage from '../../components/ChatMessage/ChatMessage';
 
 const { height, width } = Dimensions.get('screen');
 
 const HEIGHT = height;
 const WIDTH = width;
 
-const ChatScreen = ({ route }: ChatRoomProps) => {
+const ChatRoomScreen = ({ route }: ChatRoomProps) => {
   const nav = useAppNavigation();
-  const isKeyboardOpen = useKeyboard();
 
   const { name, avatarUrl, messages } = route.params;
 
@@ -32,7 +27,14 @@ const ChatScreen = ({ route }: ChatRoomProps) => {
 
   useLayoutEffect(() => {
     nav.setOptions({
-      headerTitle: name,
+      headerTitle: () => (
+        <Text
+          numberOfLines={1}
+          style={{ overflow: 'hidden', fontSize: 22, maxWidth: WIDTH - 50 }}
+        >
+          {name}
+        </Text>
+      ),
       headerTitleAlign: 'center',
       headerRight: () => (
         <TouchableOpacity>
@@ -60,21 +62,7 @@ const ChatScreen = ({ route }: ChatRoomProps) => {
           flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
         }}
         data={messages}
-        renderItem={({ item }) => {
-          if (item.userId === 'PHiQ1KNx8HRXyoaoo60e94AaKlE2') {
-            return (
-              <View style={styles.myMessage}>
-                <Text style={{ color: 'white' }}>{item.message}</Text>
-              </View>
-            );
-          } else {
-            return (
-              <View style={styles.senderMessage}>
-                <Text>{item.message}</Text>
-              </View>
-            );
-          }
-        }}
+        renderItem={({ item }) => <ChatMessage key={item.id} messageItem={item} />}
       />
       <View style={styles.newMessageContainer}>
         <TextInput
@@ -107,25 +95,6 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     flex: 1,
   },
-  myMessage: {
-    flexDirection: 'row',
-    backgroundColor: '#0084FF',
-    alignSelf: 'flex-end',
-    padding: 10,
-    margin: 10,
-    borderRadius: 50,
-    borderBottomEndRadius: 5,
-  },
-  senderMessage: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-
-    alignSelf: 'flex-start',
-    padding: 10,
-    margin: 10,
-    borderRadius: 50,
-    borderBottomStartRadius: 5,
-  },
   iconSend: {
     color: 'white',
     backgroundColor: '#0084FF',
@@ -135,4 +104,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChatScreen;
+export default ChatRoomScreen;
