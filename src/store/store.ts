@@ -1,9 +1,17 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { rootReducer } from './rootReducer';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+import { chatRoomReducer } from './ChatRoomReducer';
+import { inializeReducer } from './InitializeReducer';
 
 export const store = configureStore({
-  reducer: rootReducer,
+  reducer: {
+    chatRoom: chatRoomReducer,
+    initializeAppReducer: inializeReducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 export type AppDispatch = typeof store.dispatch;

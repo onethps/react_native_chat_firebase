@@ -1,17 +1,29 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
+  Alert,
   Dimensions,
   FlatList,
   Image,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { ChatRoomProps, useAppNavigation } from '../../types';
-import ChatMessage from '../../components/ChatMessage/ChatMessage';
+import { ChatRoomProps, MessagesType, RoomType, useAppNavigation } from '../../types';
+import SendMessageInput from '../../components/SendMessageInput';
+import ChatMessage from '../../components/ChatMessage';
+import { RootState, useAppDispatch, useAppSelector } from '../../store';
+import {
+  collection,
+  doc,
+  onSnapshot,
+  query,
+  Timestamp,
+  updateDoc,
+  where,
+} from 'firebase/firestore';
+import { auth, db } from '../../api';
+import { setNewMessage, setRooms } from '../../store/ChatRoomReducer';
 
 const { height, width } = Dimensions.get('screen');
 
@@ -21,9 +33,32 @@ const WIDTH = width;
 const ChatRoomScreen = ({ route }: ChatRoomProps) => {
   const nav = useAppNavigation();
 
-  const { name, avatarUrl, messages } = route.params;
+  const { roomName, avatarUrl, roomId, roomMessages } = route.params;
 
   const flatListRef = useRef<FlatList>(null);
+
+  const dispatch = useAppDispatch();
+
+  const [value, setValue] = useState('');
+
+  const onSendMessagePress = async (e: any) => {
+    e.preventDefault();
+    let newMessage: MessagesType = {
+      message: value,
+      createdAt: Timestamp.now(),
+      userId: auth.currentUser?.uid,
+    };
+
+    try {
+      await updateDoc(doc(db, 'chat', roomId.trim()), {
+        messages: [newMessage, ...roomMessages],
+      });
+      setValue('');
+      dispatch(setNewMessage({ newMessage, roomId }));
+    } catch (e) {
+      Alert.alert(e);
+    }
+  };
 
   useLayoutEffect(() => {
     nav.setOptions({
@@ -32,7 +67,7 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
           numberOfLines={1}
           style={{ overflow: 'hidden', fontSize: 22, maxWidth: WIDTH - 50 }}
         >
-          {name}
+          {roomName}
         </Text>
       ),
       headerTitleAlign: 'center',
@@ -53,6 +88,28 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
     });
   }, []);
 
+  const [room, setRoom] = useState<MessagesType[] | null>(null);
+  useEffect(() => {
+    const q = query(collection(db, 'chat'), where(`roomId`, '==', roomId));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      let messages: MessagesType[] = [];
+      querySnapshot.forEach((doc) => {
+        messages = doc.data().messages;
+      });
+      setRoom(messages);
+    });
+    return () => unsubscribe();
+  }, [dispatch]);
+
+  if (!room) {
+    return (
+      <View>
+        <Text>.....</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -61,17 +118,16 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
         onLayout={() => {
           flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
         }}
-        data={messages}
+        data={room}
         renderItem={({ item }) => <ChatMessage key={item.id} messageItem={item} />}
       />
-      <View style={styles.newMessageContainer}>
-        <TextInput
-          multiline={true}
-          style={styles.input}
-          placeholder={'Write new message...'}
-        />
-        <Icon style={styles.iconSend} name={'send'} size={15} />
-      </View>
+      <SendMessageInput
+        value={value}
+        setValue={setValue}
+        onSendMessagePress={onSendMessagePress}
+        roomId={roomId}
+        roomMessages={room}
+      />
     </View>
   );
 };
@@ -79,28 +135,6 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  newMessageContainer: {
-    backgroundColor: 'white',
-    paddingVertical: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
-  },
-  input: {
-    backgroundColor: '#EBEDF0',
-    marginHorizontal: 10,
-    borderRadius: 10,
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-    flex: 1,
-  },
-  iconSend: {
-    color: 'white',
-    backgroundColor: '#0084FF',
-    padding: 10,
-    borderRadius: 50,
-    alignSelf: 'flex-end',
   },
 });
 

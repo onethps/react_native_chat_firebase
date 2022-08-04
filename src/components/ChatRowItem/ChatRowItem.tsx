@@ -8,18 +8,29 @@ import {
   View,
 } from 'react-native';
 import { RoomType, useAppNavigation } from '../../types';
+import { formatDate } from '../../utils/formatDate';
+
 const { height, width } = Dimensions.get('screen');
 
 const HEIGHT = height;
 const WIDTH = width;
 
-const ChatRowItem = ({ item, message }: { item: RoomType; message: any }) => {
+const ChatRowItem = ({
+  item,
+  message,
+  roomIndex,
+}: {
+  item: RoomType;
+  message: any;
+  roomIndex: number;
+}) => {
   const nav = useAppNavigation();
 
   const onNavToChatRoomPress = () => {
     nav.navigate('ChatRoomScreen', {
-      name: item.roomName,
-      messages: item.messages,
+      roomName: item.roomName,
+      roomMessages: item.messages,
+      roomId: item.roomId,
       avatarUrl:
         'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/8a/8a702a7ab089d1934368702287381b9eb20798e6_full.jpg',
     });
@@ -39,7 +50,9 @@ const ChatRowItem = ({ item, message }: { item: RoomType; message: any }) => {
         <View style={styles.textContainer}>
           <View style={styles.headerTextContainer}>
             <Text style={styles.name}>{item.roomName}</Text>
-            <Text style={{ color: '#9a9a9a' }}>10 30</Text>
+            <Text style={{ color: '#9a9a9a' }}>
+              {formatDate(item.messages[0].createdAt.toDate())}
+            </Text>
           </View>
           <Text numberOfLines={2} style={styles.desc}>
             {message}

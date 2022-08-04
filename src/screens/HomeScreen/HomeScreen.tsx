@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { FlatList, StyleSheet, TextInput, View } from 'react-native';
-import { collection, doc, onSnapshot, orderBy, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
 
 import { RoomType } from '../../types';
 import { db } from '../../api';
 import ChatRowItem from '../../components/ChatRowItem';
+import { useAppDispatch, useAppSelector } from '../../store';
+import { allRooms, setRooms } from '../../store/ChatRoomReducer';
 
 const HomeScreen = () => {
-  const [room, setRoom] = useState<RoomType[] | null>(null);
+  const dispatch = useAppDispatch();
+
+  const allRoomChats = useAppSelector(allRooms);
 
   useEffect(() => {
     const q = query(
@@ -20,24 +24,30 @@ const HomeScreen = () => {
       querySnapshot.forEach((doc) => {
         rooms.push(doc.data() as RoomType);
       });
-      setRoom(rooms);
+      dispatch(setRooms(rooms));
     });
-
     return () => unsubscribe();
-  }, []);
+  }, [dispatch]);
 
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
         <TextInput style={styles.input} placeholder={'Search...'} />
       </View>
+      {/*home messages LIST   //////////////////////////////////////*/}
       <FlatList
         contentContainerStyle={styles.chatRows}
-        data={room}
-        renderItem={({ item, index }) => (
-          <ChatRowItem item={item} message={item.messages[index].message} />
-        )}
-        keyExtractor={(item, index) => item.roomName + Math.floor(Math.random() * 100)}
+        data={allRoomChats}
+        renderItem={({ item, index }) => {
+          return (
+            <ChatRowItem
+              roomIndex={index}
+              item={item}
+              message={item.messages[0].message}
+            />
+          );
+        }}
+        keyExtractor={(item) => item.roomId}
       />
     </View>
   );

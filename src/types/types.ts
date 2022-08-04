@@ -3,7 +3,12 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type RootStackParamList = {
   Home: undefined;
-  ChatRoomScreen: { name: string; avatarUrl: string; messages: MessagesType[] };
+  ChatRoomScreen: {
+    roomName: string;
+    roomMessages: any[];
+    avatarUrl: string;
+    roomId: string;
+  };
   SignUpScreen: undefined;
   SignInScreen: undefined;
 };
@@ -14,14 +19,15 @@ export type NavigationUseType = NavigationProp<RootStackParamList>;
 export const useAppNavigation = () => useNavigation<NavigationUseType>();
 
 export type MessagesType = {
-  createdAt: string;
   message: string;
-  userId: string;
+  createdAt: any;
+  userId: string | undefined;
 };
 
 export type RoomType = {
-  createdAt: string;
+  createdAt: any;
   messages: MessagesType[];
   users: number[];
   roomName: string;
+  roomId: string;
 };

@@ -17,6 +17,7 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../../api';
+import { firstCharAvatarGenerator } from '../../utils/avatarGenerator';
 
 const { height, width } = Dimensions.get('screen');
 
@@ -54,6 +55,7 @@ const SignUpScreen = () => {
         uid: result.user.uid,
         email: data.email,
         password: data.password,
+        avatar: firstCharAvatarGenerator(data.email),
       });
     } catch (e) {
       setError(e.message);
