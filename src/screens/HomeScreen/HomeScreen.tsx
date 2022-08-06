@@ -1,53 +1,81 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, StyleSheet, TextInput, View } from 'react-native';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from 'firebase/firestore';
 
 import { RoomType } from '../../types';
-import { db } from '../../api';
+import { auth, db } from '../../api';
 import ChatRowItem from '../../components/ChatRowItem';
 import { useAppDispatch, useAppSelector } from '../../store';
-import { allRooms, setRooms } from '../../store/ChatRoomReducer';
+import { allRoomsSelector, setRooms } from '../../store/ChatRoomReducer';
+import { setMyProfile } from '../../store/UsersReducer';
+import { UserType } from '../../types/types';
 
 const HomeScreen = () => {
-  const dispatch = useAppDispatch();
-
-  const allRoomChats = useAppSelector(allRooms);
+  const [rooms, setRooms] = useState<RoomType[] | null>(null);
+  const [userProfiles, setUserProfiles] = useState<UserType[] | null>(null);
 
   useEffect(() => {
     const q = query(
       collection(db, 'chat'),
-      where(`users1.PHiQ1KNx8HRXyoaoo60e94AaKlE2`, '==', true),
+      where(`users.${auth.currentUser?.uid}`, '==', true),
     );
-
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       let rooms: RoomType[] = [];
       querySnapshot.forEach((doc) => {
         rooms.push(doc.data() as RoomType);
       });
-      dispatch(setRooms(rooms));
+      setRooms(rooms);
     });
     return () => unsubscribe();
-  }, [dispatch]);
+  }, []);
+
+  useEffect(() => {
+    if (rooms) {
+      const q = query(
+        collection(db, 'users'),
+        where(`users.${auth.currentUser?.uid}`, '==', true),
+      );
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        let rooms: RoomType[] = [];
+        querySnapshot.forEach((doc) => {
+          rooms.push(doc.data() as RoomType);
+        });
+        setRooms(rooms);
+      });
+      return () => unsubscribe();
+    }
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
         <TextInput style={styles.input} placeholder={'Search...'} />
       </View>
-      {/*home messages LIST   //////////////////////////////////////*/}
+      {/*HOME PAGE ROOMS LIST*/}
       <FlatList
         contentContainerStyle={styles.chatRows}
-        data={allRoomChats}
+        data={rooms}
         renderItem={({ item, index }) => {
           return (
             <ChatRowItem
-              roomIndex={index}
               item={item}
-              message={item.messages[0].message}
+              index={index}
+              //last message
+              message={item.lastMsg}
             />
           );
         }}
-        keyExtractor={(item) => item.roomId}
+        keyExtractor={(item) => item.roomId + Math.floor(Math.random() * 100)}
       />
     </View>
   );

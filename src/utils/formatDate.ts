@@ -5,9 +5,10 @@ dayjs.extend(calendar);
 export const formatDate = (date: any) => {
   return dayjs(date).calendar(null, {
     sameDay: 'HH:mm',
+    lastDay: 'ddd',
     nextDay: 'ddd',
     nextWeek: 'DD/MM',
-    nextYear: 'DD/MM/YY',
+    lastWeek: 'DD/MM',
     sameElse: 'DD/MM/YY',
   });
 };

@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { MessagesType, RoomType } from '../types';
 import { RootState } from './store';
+import { UserType } from '../types/types';
 
 type PayloadType = {
   roomId: string;
@@ -11,6 +12,7 @@ const slice = createSlice({
   name: 'chatRoom',
   initialState: {
     rooms: [] as RoomType[],
+    myProfile: {} as UserType,
     loading: false,
   },
 
@@ -34,5 +36,6 @@ export const chatRoomReducer = slice.reducer;
 
 export const { setRooms, setNewMessage, setIsLoading } = slice.actions;
 
-export const allRooms = (state: RootState) => state.chatRoom.rooms;
-export const loadingChats = (state: RootState) => state.chatRoom.rooms;
+export const allRoomsSelector = (state: RootState) => state.chatRoom.rooms;
+
+export const loadingChatsSelector = (state: RootState) => state.chatRoom.rooms;

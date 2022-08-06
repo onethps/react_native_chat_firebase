@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { auth } from '../../api';
 
 type ChatMessageProps = {
   messageItem: {
@@ -10,7 +11,7 @@ type ChatMessageProps = {
 };
 
 const ChatMessage: FC<ChatMessageProps> = ({ messageItem }) => {
-  const myId = 'PHiQ1KNx8HRXyoaoo60e94AaKlE2';
+  const myId = auth.currentUser?.uid;
 
   const checkOwnMessage = messageItem.userId === myId;
 

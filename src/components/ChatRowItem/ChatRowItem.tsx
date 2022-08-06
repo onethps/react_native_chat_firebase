@@ -1,40 +1,56 @@
-import React from 'react';
-import {
-  Dimensions,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RoomType, useAppNavigation } from '../../types';
 import { formatDate } from '../../utils/formatDate';
-
-const { height, width } = Dimensions.get('screen');
-
-const HEIGHT = height;
-const WIDTH = width;
+import { auth, db } from '../../api';
+import { doc, getDoc } from 'firebase/firestore';
+import { UserType } from '../../types/types';
 
 const ChatRowItem = ({
   item,
   message,
-  roomIndex,
+  index,
 }: {
   item: RoomType;
   message: any;
-  roomIndex: number;
+  index: number;
 }) => {
   const nav = useAppNavigation();
 
   const onNavToChatRoomPress = () => {
     nav.navigate('ChatRoomScreen', {
-      roomName: item.roomName,
       roomMessages: item.messages,
       roomId: item.roomId,
-      avatarUrl:
-        'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/8a/8a702a7ab089d1934368702287381b9eb20798e6_full.jpg',
+      roomIndex: index,
+      profileSender,
     });
   };
+
+  const [profileSender, setProfileSender] = useState<UserType | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (item) {
+      const getSenderId = Object.keys(item.users).filter(
+        (id) => id !== auth.currentUser?.uid,
+      );
+      const fetchUserEmail = async () => {
+        const docSnap = await getDoc(doc(db, 'users', getSenderId[0]));
+        if (docSnap.exists()) {
+          if (isMounted) setProfileSender(docSnap.data() as UserType);
+        } else {
+          console.log('No such document!');
+        }
+      };
+      fetchUserEmail().catch((err) => {
+        if (!isMounted) return;
+      });
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <TouchableOpacity onPress={onNavToChatRoomPress}>
@@ -42,17 +58,16 @@ const ChatRowItem = ({
         <View style={styles.circle}>
           <Image
             source={{
-              uri: 'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/8a/8a702a7ab089d1934368702287381b9eb20798e6_full.jpg',
+              uri: profileSender?.avatar,
             }}
             style={styles.avatar}
           />
         </View>
         <View style={styles.textContainer}>
           <View style={styles.headerTextContainer}>
-            <Text style={styles.name}>{item.roomName}</Text>
-            <Text style={{ color: '#9a9a9a' }}>
-              {formatDate(item.messages[0].createdAt.toDate())}
-            </Text>
+            <Text style={styles.name}>{profileSender?.email}</Text>
+            {/*TODO fix date*/}
+            <Text style={{ color: '#9a9a9a' }}>{formatDate(new Date())}</Text>
           </View>
           <Text numberOfLines={2} style={styles.desc}>
             {message}
@@ -67,12 +82,13 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: 5,
   },
   circle: {},
   avatar: {
     flex: 1,
     borderRadius: 50,
-    width: '40%',
+    width: '20%',
     aspectRatio: 1,
   },
   textContainer: {

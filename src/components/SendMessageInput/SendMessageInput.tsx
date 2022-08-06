@@ -1,18 +1,15 @@
 import React, { FC } from 'react';
 import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { MessagesType } from '../../types';
 
 type SendMessageInputType = {
-  roomId: string;
-  roomMessages: any[];
   value: string;
   setValue: (val: string) => void;
   onSendMessagePress: (e: any) => void;
 };
 
 const SendMessageInput: FC<SendMessageInputType> = ({
-  roomId,
-  roomMessages,
   onSendMessagePress,
   setValue,
   value,

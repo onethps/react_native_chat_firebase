@@ -4,13 +4,16 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 export type RootStackParamList = {
   Home: undefined;
   ChatRoomScreen: {
-    roomName: string;
-    roomMessages: any[];
-    avatarUrl: string;
-    roomId: string;
+    userEmail?: string;
+    roomMessages?: any[];
+    roomId?: string;
+    profileSender?: UserType | null;
+    roomIndex?: number;
+    userId?: string;
   };
   SignUpScreen: undefined;
   SignInScreen: undefined;
+  ProfileScreen: undefined;
 };
 
 export type ChatRoomProps = NativeStackScreenProps<RootStackParamList, 'ChatRoomScreen'>;
@@ -24,10 +27,19 @@ export type MessagesType = {
   userId: string | undefined;
 };
 
+export type UserType = {
+  avatar: string;
+  email: string;
+  isOnline: boolean;
+  password: string;
+  uid: string;
+};
+
 export type RoomType = {
   createdAt: any;
-  messages: MessagesType[];
+  messages?: MessagesType[];
   users: number[];
   roomName: string;
   roomId: string;
+  lastMsg: string;
 };

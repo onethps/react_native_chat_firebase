@@ -1,27 +1,43 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Image, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { db } from '../../api';
+import { auth, db } from '../../api';
+import { useAppDispatch } from '../../store';
+import { useSelector } from 'react-redux';
+import { allUsersSelector, setAllUsers } from '../../store/UsersReducer';
+import { useAppNavigation } from '../../types';
+import { UserType } from '../../types/types';
 
 const UserListScreen = () => {
-  const [allUsers, setAllUsers] = useState<any[] | null>(null);
+  const nav = useAppNavigation();
+
+  const [userList, setUserList] = useState<UserType[] | null>(null);
 
   useEffect(() => {
-    const q = query(
-      collection(db, 'users'),
-      where(`uid`, '!=', 'PHiQ1KNx8HRXyoaoo60e94AaKlE2'),
-    );
+    const q = query(collection(db, 'users'), where('uid', '!=', auth.currentUser?.uid));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      let users = [] as any;
+      let users = [] as UserType[];
       querySnapshot.forEach((doc) => {
-        users.push(doc.data());
+        users.push(doc.data() as UserType);
       });
-      setAllUsers(users);
+      setUserList(users);
     });
 
     return () => unsubscribe();
   }, []);
+
+  const onNavToChatRoomPress = (userEmail: string, userId: string) => {
+    nav.navigate('ChatRoomScreen', { userEmail, userId });
+  };
 
   return (
     <View style={styles.container}>
@@ -32,20 +48,22 @@ const UserListScreen = () => {
         contentContainerStyle={{
           padding: 20,
         }}
-        data={allUsers}
+        data={userList}
         renderItem={({ item }) => (
-          <View style={styles.userContainer}>
-            <Image
-              style={styles.avatar}
-              source={{
-                uri: 'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/avatars/8a/8a702a7ab089d1934368702287381b9eb20798e6_full.jpg',
-              }}
-            />
-            <View style={styles.userItem}>
-              <Text style={styles.userItemText}>{item.email}</Text>
-              <Text style={styles.userItemDesc}>was nearly</Text>
+          <TouchableOpacity onPress={() => onNavToChatRoomPress(item.email, item.uid)}>
+            <View style={styles.userContainer}>
+              <Image
+                style={styles.avatar}
+                source={{
+                  uri: item.avatar,
+                }}
+              />
+              <View style={styles.userItem}>
+                <Text style={styles.userItemText}>{item.email}</Text>
+                <Text style={styles.userItemDesc}>was nearly</Text>
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
         )}
         keyExtractor={(item, index) => item.uid}
       />

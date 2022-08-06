@@ -8,6 +8,7 @@ import SignUpScreen from '../screens/SignUpScreen';
 import { HomeTabs } from './HomeTabs';
 import { useAppDispatch, useAppSelector } from '../store';
 import { isInitialized, setIsLoggedIn } from '../store/InitializeReducer';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const HomeStack = createNativeStackNavigator();
 
@@ -36,6 +37,14 @@ export const StackNavigator = () => {
             }}
           />
           <HomeStack.Screen name={'ChatRoomScreen'} component={ChatRoomScreen} />
+          <HomeStack.Screen
+            name={'ProfileScreen'}
+            component={ProfileScreen}
+            options={{
+              headerTransparent: true,
+              title: '',
+            }}
+          />
         </>
       ) : (
         <>
