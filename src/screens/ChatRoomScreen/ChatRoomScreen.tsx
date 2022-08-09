@@ -53,7 +53,6 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
   const [roomMessages, setRoomMessages] = useState<MessagesType[] | any>(null);
   const [currentRoomId, setCurrentRoomId] = useState<string | undefined>(roomId);
   const [value, setValue] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
 
   const flatListRef = useRef<FlatList>(null);
   //find room with users ID's
@@ -64,10 +63,14 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
         where(`users.${userId}`, '==', true),
         where(`users.${auth.currentUser?.uid}`, '==', true),
       );
-      const querySnapshot = await getDocs(subColRef);
-      querySnapshot.forEach((doc) => {
-        setCurrentRoomId(doc.data().roomId);
-      });
+      try {
+        const querySnapshot = await getDocs(subColRef);
+        querySnapshot.forEach((doc) => {
+          setCurrentRoomId(doc.data().roomId);
+        });
+      } catch (e) {
+        console.log(e);
+      }
     };
     fetch();
   }, [userId]);
@@ -79,13 +82,19 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
         orderBy('createdAt', 'desc'),
       );
 
-      const unsubscribe = onSnapshot(subColRef, (querySnapshot) => {
-        let messages: MessagesType[] = [];
-        querySnapshot.forEach((doc) => {
-          messages.push(doc.data() as MessagesType);
-        });
-        setRoomMessages(messages);
-      });
+      const unsubscribe = onSnapshot(
+        subColRef,
+        (querySnapshot) => {
+          let messages: MessagesType[] = [];
+          querySnapshot.forEach((doc) => {
+            messages.push(doc.data() as MessagesType);
+          });
+          setRoomMessages(messages);
+        },
+        (err) => {
+          console.log(err);
+        },
+      );
 
       return () => unsubscribe();
     }
@@ -163,7 +172,6 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
 
     if (!currentRoomId) {
       const usersInRoom: any = {};
-      console.log('we in');
       if (auth.currentUser && userId) {
         usersInRoom[auth.currentUser?.uid] = true;
         usersInRoom[userId] = true;
@@ -185,7 +193,6 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
           lastMsg: value,
         });
         setValue('');
-        console.log(newRef.id);
         setCurrentRoomId(newRef.id);
       } catch (e) {
         Alert.alert(e);
@@ -202,17 +209,9 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
     [],
   );
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Text style={{ color: 'white' }}>loading...</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
-      {roomMessages?.length ? (
+      {currentRoomId ? (
         <FlatList
           ref={flatListRef}
           inverted
