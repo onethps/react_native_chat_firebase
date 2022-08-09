@@ -33,13 +33,17 @@ const SendMessageInput: FC<SendMessageInputType> = ({
         style={styles.input}
         placeholder={'Message...'}
       />
-      <Icon name={'microphone'} style={{ fontSize: 20, color: theme.colors.inputText }} />
 
       {value ? (
         <TouchableOpacity onPress={onSendMessagePress}>
           <Icon style={styles.iconSend} name={'send'} size={15} />
         </TouchableOpacity>
-      ) : null}
+      ) : (
+        <Icon
+          name={'microphone'}
+          style={{ fontSize: 20, color: theme.colors.inputText }}
+        />
+      )}
     </View>
   );
 };

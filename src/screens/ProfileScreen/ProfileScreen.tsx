@@ -84,10 +84,10 @@ const ProfileScreen = () => {
     <View style={styles.container}>
       <View>
         <Image style={styles.avatar} source={{ uri: myProfile?.avatar }} />
-        <TouchableOpacity style={styles.photoIconCircle}>
+        <TouchableOpacity style={styles.changePhotoIconCircle}>
           <Icon name={'camera-outline'} onPress={pickImage} size={25} color={'white'} />
         </TouchableOpacity>
-        <Text style={styles.textStyle}>{myProfile?.email}</Text>
+        <Text style={styles.userName}>{myProfile?.email}</Text>
       </View>
       <View style={styles.menuButtonsGroup}>
         <Text style={styles.menuGroupTitle}>Account</Text>
@@ -135,7 +135,7 @@ const createStyles = (theme: globalThemeTypes) =>
       height: 300,
       position: 'relative',
     },
-    photoIconCircle: {
+    changePhotoIconCircle: {
       backgroundColor: theme.colors.primary,
       padding: 10,
       position: 'absolute',
@@ -144,31 +144,34 @@ const createStyles = (theme: globalThemeTypes) =>
       borderRadius: 20,
       zIndex: 10,
     },
-    textStyle: {
+    userName: {
       position: 'absolute',
       bottom: 20,
       left: 20,
       color: theme.colors.text,
       fontWeight: 'bold',
     },
+    menuButtonsGroup: {
+      backgroundColor: theme.colors.backgroundLight,
+      paddingVertical: 15,
+    },
     menuGroupTitle: {
       color: theme.colors.primary,
       fontWeight: 'bold',
-    },
-    menuButtonsGroup: {
-      backgroundColor: theme.colors.backgroundLight,
-      padding: 10,
-      paddingHorizontal: 40,
-    },
-    menuItem: {
       paddingVertical: 10,
-      color: theme.colors.text,
+      paddingHorizontal: 20,
     },
     menuItemWithBorder: {
       paddingVertical: 10,
+      paddingHorizontal: 20,
       color: theme.colors.text,
       borderColor: theme.colors.border,
       borderBottomWidth: 1,
+    },
+    menuItem: {
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      color: theme.colors.text,
     },
   });
 

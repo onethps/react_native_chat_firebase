@@ -264,19 +264,15 @@ const createStyles = (theme: globalThemeTypes) =>
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
+      opacity: 0.8,
     },
     chatBoxTextContainer: {
       width: '50%',
       height: 200,
-      backgroundColor: theme.colors.backgroundLight,
+      backgroundColor: theme.colors.bgHigh,
+
       padding: 20,
       borderRadius: 20,
-
-      shadowColor: '#000',
-      shadowOffset: { width: 1, height: 1 },
-      shadowOpacity: 0.1,
-      shadowRadius: 3,
-      elevation: 5,
     },
     textTitle: {
       color: theme.colors.text,
