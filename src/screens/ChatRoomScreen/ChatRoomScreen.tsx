@@ -1,4 +1,11 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   Alert,
   Dimensions,
@@ -12,11 +19,9 @@ import {
 import { ChatRoomProps, MessagesType, useAppNavigation } from '../../types';
 import SendMessageInput from '../../components/SendMessageInput';
 import ChatMessage from '../../components/ChatMessage';
-import { useAppDispatch } from '../../store';
 import {
   collection,
   doc,
-  getDoc,
   getDocs,
   onSnapshot,
   orderBy,
@@ -27,6 +32,8 @@ import {
   where,
 } from 'firebase/firestore';
 import { auth, db } from '../../api';
+import { useTheme } from '@react-navigation/native';
+import { globalThemeTypes } from '../../types/types';
 
 const { height, width } = Dimensions.get('screen');
 
@@ -34,17 +41,22 @@ const HEIGHT = height;
 const WIDTH = width;
 
 const ChatRoomScreen = ({ route }: ChatRoomProps) => {
+  const nav = useAppNavigation();
+
+  // const docsa = DocumentPicker.getDocumentAsync();
+
+  const theme = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   const { roomId, userId, profileSender, userEmail } = route.params;
 
-  const [currentRoomId, setCurrentRoomId] = useState(roomId);
-  const dispatch = useAppDispatch();
-  const nav = useAppNavigation();
-  const flatListRef = useRef<FlatList>(null);
-
-  const [value, setValue] = useState('');
   const [roomMessages, setRoomMessages] = useState<MessagesType[] | any>(null);
+  const [currentRoomId, setCurrentRoomId] = useState<string | undefined>(roomId);
+  const [value, setValue] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // set messages from user list
+  const flatListRef = useRef<FlatList>(null);
+  //find room with users ID's
   useEffect(() => {
     const fetch = async () => {
       const subColRef = query(
@@ -70,22 +82,46 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
       const unsubscribe = onSnapshot(subColRef, (querySnapshot) => {
         let messages: MessagesType[] = [];
         querySnapshot.forEach((doc) => {
-          messages.push(doc.data() as any);
+          messages.push(doc.data() as MessagesType);
         });
         setRoomMessages(messages);
       });
 
       return () => unsubscribe();
     }
-  }, [dispatch, currentRoomId]);
+  }, [currentRoomId]);
+
+  ///change unread status///
+
+  useEffect(() => {
+    if (currentRoomId && auth.currentUser) {
+      const subColRef = query(
+        collection(db, 'chat', currentRoomId, 'messages'),
+        where('unread', '==', true),
+        where('userId', '!=', auth.currentUser?.uid),
+      );
+
+      const unsubscribe = onSnapshot(
+        subColRef,
+        (querySnapshot) => {
+          querySnapshot.forEach(async (doc) => {
+            await updateDoc(doc.ref, {
+              unread: false,
+            });
+          });
+        },
+        (error) => {
+          console.error(error);
+        },
+      );
+      return () => unsubscribe();
+    }
+  }, [currentRoomId]);
 
   useLayoutEffect(() => {
     nav.setOptions({
       headerTitle: () => (
-        <Text
-          numberOfLines={1}
-          style={{ overflow: 'hidden', fontSize: 22, maxWidth: WIDTH - 50 }}
-        >
+        <Text numberOfLines={1} style={styles.headerStyle}>
           {profileSender?.email || userEmail}
         </Text>
       ),
@@ -93,12 +129,7 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
       headerRight: () => (
         <TouchableOpacity onPress={onNavToProfilePress}>
           <Image
-            style={{
-              width: 40,
-              height: 40,
-              marginHorizontal: 10,
-              borderRadius: 100,
-            }}
+            style={styles.avatar}
             source={{
               uri: profileSender?.avatar,
             }}
@@ -109,17 +140,18 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
   }, []);
 
   const onSendMessagePress = async () => {
+    let newMessage: MessagesType = {
+      message: value,
+      createdAt: Timestamp.now(),
+      userId: auth.currentUser?.uid,
+      unread: true,
+    };
     if (currentRoomId) {
-      // const subColRef = query(collection(db, 'chat', currentRoomId));
-
-      let newMessage: MessagesType = {
-        message: value,
-        createdAt: Timestamp.now(),
-        userId: auth.currentUser?.uid,
-      };
       try {
         const newCityRef = doc(collection(db, 'chat', currentRoomId, 'messages'));
+        //create new room with first message
         await setDoc(newCityRef, newMessage);
+        //
         await updateDoc(doc(db, 'chat', currentRoomId), {
           lastMsg: value,
         });
@@ -131,14 +163,13 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
 
     if (!currentRoomId) {
       const usersInRoom: any = {};
-
+      console.log('we in');
       if (auth.currentUser && userId) {
         usersInRoom[auth.currentUser?.uid] = true;
         usersInRoom[userId] = true;
       }
       const newRoom = {
         createdAt: Timestamp.now(),
-        roomName: route.params.userEmail,
         users: usersInRoom,
       };
 
@@ -146,16 +177,15 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
         const newRef = doc(collection(db, 'chat'));
         await setDoc(newRef, newRoom);
         const newMessages = doc(collection(db, 'chat', newRef.id, 'messages'));
-        await setDoc(newMessages, {
-          message: value,
-          createdAt: Timestamp.now(),
-          userId: auth.currentUser?.uid,
-        });
+        //update room with new message
+        await setDoc(newMessages, newMessage);
+        //
         await updateDoc(newRef, {
           roomId: newRef.id,
           lastMsg: value,
         });
         setValue('');
+        console.log(newRef.id);
         setCurrentRoomId(newRef.id);
       } catch (e) {
         Alert.alert(e);
@@ -167,6 +197,19 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
     nav.navigate('ProfileScreen');
   };
 
+  const chatMessageRenderItem = useCallback(
+    ({ item, index }) => <ChatMessage key={index + item.message} messageItem={item} />,
+    [],
+  );
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text style={{ color: 'white' }}>loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {roomMessages?.length ? (
@@ -177,14 +220,17 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
             flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
           }}
           data={roomMessages}
-          renderItem={({ item, index }) => {
-            return <ChatMessage key={index} messageItem={item} />;
-          }}
+          renderItem={chatMessageRenderItem}
           keyExtractor={(item, index) => item + index}
         />
       ) : (
-        <View style={{ flex: 1 }}>
-          <Text>No messages</Text>
+        <View style={styles.chatBox}>
+          <View style={styles.chatBoxTextContainer}>
+            <Text style={styles.textTitle}>No messages yet...</Text>
+            <Text style={styles.textDesc}>
+              Send your first message to start chatting...
+            </Text>
+          </View>
         </View>
       )}
       <SendMessageInput
@@ -196,10 +242,54 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+const createStyles = (theme: globalThemeTypes) =>
+  StyleSheet.create({
+    headerStyle: {
+      overflow: 'hidden',
+      fontSize: 22,
+      maxWidth: WIDTH - 50,
+      color: theme.colors.text,
+    },
+    container: {
+      flex: 1,
+    },
+    avatar: {
+      width: 40,
+      height: 40,
+      marginHorizontal: 10,
+      borderRadius: 100,
+    },
+    /// styles if no any messages
+    chatBox: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    chatBoxTextContainer: {
+      width: '50%',
+      height: 200,
+      backgroundColor: theme.colors.backgroundLight,
+      padding: 20,
+      borderRadius: 20,
+
+      shadowColor: '#000',
+      shadowOffset: { width: 1, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 3,
+      elevation: 5,
+    },
+    textTitle: {
+      color: theme.colors.text,
+      fontWeight: 'bold',
+      fontSize: 18,
+      textAlign: 'center',
+      marginVertical: 10,
+    },
+    textDesc: {
+      color: theme.colors.text,
+      textAlign: 'center',
+    },
+    /// styles if no any messages
+  });
 
 export default ChatRoomScreen;

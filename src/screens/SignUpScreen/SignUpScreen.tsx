@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Button,
   Dimensions,
@@ -18,6 +18,8 @@ import {
 import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../../api';
 import { firstCharAvatarGenerator } from '../../utils/avatarGenerator';
+import { globalThemeTypes } from '../../types/types';
+import { useTheme } from '@react-navigation/native';
 
 const { height, width } = Dimensions.get('screen');
 
@@ -27,6 +29,9 @@ const WIDTH = width;
 const SignUpScreen = () => {
   const nav = useAppNavigation();
   const [error, setError] = useState(null);
+
+  const theme = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const {
     control,
@@ -97,35 +102,36 @@ const SignUpScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-  },
-  headerTextContainer: {
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  h1: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    paddingVertical: 10,
-  },
-  input: {
-    borderWidth: 2,
-    padding: 10,
-    marginVertical: 10,
-  },
-  linkStyle: {
-    color: 'blue',
-    textAlign: 'center',
-    marginTop: 20,
-  },
-  errorText: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: 'red',
-  },
-});
+const createStyles = (theme: globalThemeTypes) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingHorizontal: 20,
+    },
+    headerTextContainer: {
+      alignItems: 'center',
+      paddingVertical: 20,
+    },
+    h1: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      paddingVertical: 10,
+    },
+    input: {
+      borderWidth: 2,
+      padding: 10,
+      marginVertical: 10,
+    },
+    linkStyle: {
+      color: theme.colors.primary,
+      textAlign: 'center',
+      marginTop: 20,
+    },
+    errorText: {
+      textAlign: 'center',
+      marginTop: 20,
+      color: 'red',
+    },
+  });
 
 export default SignUpScreen;

@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RoomType, useAppNavigation } from '../../types';
 import { formatDate } from '../../utils/formatDate';
 import { auth, db } from '../../api';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot, query, where } from 'firebase/firestore';
 import { UserType } from '../../types/types';
+import { Theme, useTheme } from '@react-navigation/native';
 
 const ChatRowItem = ({
   item,
@@ -16,6 +17,11 @@ const ChatRowItem = ({
   index: number;
 }) => {
   const nav = useAppNavigation();
+  const [profileSender, setProfileSender] = useState<UserType | null>(null);
+  const [unreadCount, setUnreadCount] = useState<null | number>(null);
+
+  const theme = useTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const onNavToChatRoomPress = () => {
     nav.navigate('ChatRoomScreen', {
@@ -26,15 +32,13 @@ const ChatRowItem = ({
     });
   };
 
-  const [profileSender, setProfileSender] = useState<UserType | null>(null);
-
   useEffect(() => {
     let isMounted = true;
     if (item) {
       const getSenderId = Object.keys(item.users).filter(
         (id) => id !== auth.currentUser?.uid,
       );
-      const fetchUserEmail = async () => {
+      const fetchUserSenderProfile = async () => {
         const docSnap = await getDoc(doc(db, 'users', getSenderId[0]));
         if (docSnap.exists()) {
           if (isMounted) setProfileSender(docSnap.data() as UserType);
@@ -42,7 +46,7 @@ const ChatRowItem = ({
           console.log('No such document!');
         }
       };
-      fetchUserEmail().catch((err) => {
+      fetchUserSenderProfile().catch((err) => {
         if (!isMounted) return;
       });
     }
@@ -52,16 +56,39 @@ const ChatRowItem = ({
     };
   }, []);
 
+  useEffect(() => {
+    if (item.roomId) {
+      const q = query(
+        collection(db, 'chat', item.roomId, 'messages'),
+        where(`unread`, '==', true),
+        where('userId', '!=', auth.currentUser?.uid),
+      );
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        let rooms: RoomType[] = [];
+        querySnapshot.forEach((doc) => {
+          rooms.push(doc.data() as RoomType);
+        });
+        setUnreadCount(rooms.length);
+      });
+      return () => unsubscribe();
+    }
+  }, []);
+
   return (
     <TouchableOpacity onPress={onNavToChatRoomPress}>
       <View style={styles.container}>
-        <View style={styles.circle}>
+        <View>
           <Image
             source={{
               uri: profileSender?.avatar,
             }}
             style={styles.avatar}
           />
+          {unreadCount ? (
+            <View style={styles.unreadMessagesCountContainer}>
+              <Text style={styles.unreadCount}>{unreadCount}</Text>
+            </View>
+          ) : null}
         </View>
         <View style={styles.textContainer}>
           <View style={styles.headerTextContainer}>
@@ -78,36 +105,53 @@ const ChatRowItem = ({
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 5,
-  },
-  circle: {},
-  avatar: {
-    flex: 1,
-    borderRadius: 50,
-    width: '20%',
-    aspectRatio: 1,
-  },
-  textContainer: {
-    paddingHorizontal: 10,
-    flex: 2,
-    paddingVertical: 5,
-    borderBottomColor: '#ececec',
-    borderBottomWidth: 1,
-  },
-  headerTextContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  name: {
-    fontSize: 16,
-  },
-  desc: {
-    color: '#9a9a9a',
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 5,
+      paddingHorizontal: 10,
+    },
+    avatar: {
+      marginRight: 5,
+      borderRadius: 50,
+      width: 50,
+      height: 50,
+      position: 'relative',
+    },
+    unreadMessagesCountContainer: {
+      backgroundColor: theme.colors.primary,
+      position: 'absolute',
+      bottom: 0,
+      right: 0,
+      paddingHorizontal: 5,
+      borderRadius: 10,
+      borderColor: theme.colors.border,
+      borderWidth: 2,
+    },
+    unreadCount: {
+      color: theme.colors.text,
+    },
+    textContainer: {
+      paddingHorizontal: 10,
+      flex: 2,
+      paddingVertical: 5,
+      borderBottomColor: theme.colors.border,
+      borderBottomWidth: 1,
+    },
+    headerTextContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    name: {
+      fontSize: 16,
+      color: theme.colors.text,
+    },
+    desc: {
+      color: theme.colors.text,
+      opacity: 0.5,
+    },
+  });
 
 export default ChatRowItem;

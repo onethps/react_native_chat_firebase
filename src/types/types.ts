@@ -1,4 +1,4 @@
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { NavigationProp, Theme, useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type RootStackParamList = {
@@ -16,6 +16,18 @@ export type RootStackParamList = {
   ProfileScreen: undefined;
 };
 
+export type customColors = {
+  colors?: {
+    backgroundLight?: string;
+    inputBgLight?: string;
+    chatRoomBg?: string;
+    bgHigh?: string;
+    inputText?: string;
+  };
+};
+
+export type globalThemeTypes = Theme & customColors;
+
 export type ChatRoomProps = NativeStackScreenProps<RootStackParamList, 'ChatRoomScreen'>;
 
 export type NavigationUseType = NavigationProp<RootStackParamList>;
@@ -25,6 +37,7 @@ export type MessagesType = {
   message: string;
   createdAt: any;
   userId: string | undefined;
+  unread: boolean;
 };
 
 export type UserType = {

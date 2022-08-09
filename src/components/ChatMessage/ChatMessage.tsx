@@ -12,7 +12,6 @@ type ChatMessageProps = {
 
 const ChatMessage: FC<ChatMessageProps> = ({ messageItem }) => {
   const myId = auth.currentUser?.uid;
-
   const checkOwnMessage = messageItem.userId === myId;
 
   return (
@@ -29,18 +28,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#0084FF',
     alignSelf: 'flex-end',
-    padding: 10,
+    padding: 15,
     margin: 10,
-    borderRadius: 50,
+    borderRadius: 20,
     borderBottomEndRadius: 5,
   },
   senderMessage: {
     flexDirection: 'row',
     backgroundColor: 'white',
     alignSelf: 'flex-start',
-    padding: 10,
+    padding: 15,
     margin: 10,
-    borderRadius: 50,
+    borderRadius: 20,
     borderBottomStartRadius: 5,
   },
 });

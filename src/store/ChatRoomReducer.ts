@@ -24,7 +24,7 @@ const slice = createSlice({
       const roomIndex = state.rooms.findIndex(
         (currentRoom) => currentRoom.roomId === action.payload.roomId,
       );
-      state.rooms[roomIndex].messages.push(action.payload.newMessage);
+      state.rooms[roomIndex].messages?.push(action.payload.newMessage);
     },
     setIsLoading: (state, action) => {
       state.loading = action.payload;
