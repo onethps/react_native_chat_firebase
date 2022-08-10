@@ -12,7 +12,7 @@ import UserListScreen from '../screens/UserListScreen';
 import ProfileScreen from '../screens/ProfileScreen/ProfileScreen';
 import { useTheme } from '@react-navigation/native';
 import { globalThemeTypes } from '../types/types';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 const HomeStack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -80,6 +80,8 @@ export const HomeTabs = () => {
 export const StackNavigator = () => {
   const [isLogged, setIsLogged] = useState(false);
 
+  const theme: globalThemeTypes = useTheme();
+
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -89,33 +91,35 @@ export const StackNavigator = () => {
   }, []);
 
   return (
-    <HomeStack.Navigator>
-      {isLogged ? (
-        <>
-          <HomeStack.Screen
-            name={'HomeScreen'}
-            component={HomeTabs}
-            options={{
-              headerShown: false,
-            }}
-          />
-          <HomeStack.Screen name={'ChatRoomScreen'} component={ChatRoomScreen} />
-          <HomeStack.Screen
-            name={'ProfileScreen'}
-            component={ProfileScreen}
-            options={{
-              headerTransparent: true,
-              title: '',
-            }}
-          />
-        </>
-      ) : (
-        <>
-          <HomeStack.Screen name={'SignInScreen'} component={SignInScreen} />
-          <HomeStack.Screen name={'SignUpScreen'} component={SignUpScreen} />
-        </>
-      )}
-    </HomeStack.Navigator>
+    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <HomeStack.Navigator>
+        {isLogged ? (
+          <>
+            <HomeStack.Screen
+              name={'HomeScreen'}
+              component={HomeTabs}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <HomeStack.Screen name={'ChatRoomScreen'} component={ChatRoomScreen} />
+            <HomeStack.Screen
+              name={'ProfileScreen'}
+              component={ProfileScreen}
+              options={{
+                headerTransparent: true,
+                title: '',
+              }}
+            />
+          </>
+        ) : (
+          <>
+            <HomeStack.Screen name={'SignInScreen'} component={SignInScreen} />
+            <HomeStack.Screen name={'SignUpScreen'} component={SignUpScreen} />
+          </>
+        )}
+      </HomeStack.Navigator>
+    </View>
   );
 };
 
