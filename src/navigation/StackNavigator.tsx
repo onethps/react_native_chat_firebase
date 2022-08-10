@@ -1,12 +1,10 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../api';
 import ChatRoomScreen from '../screens/ChatRoomScreen';
 import SignInScreen from '../screens/SignInScreen';
 import SignUpScreen from '../screens/SignUpScreen';
-import { useAppDispatch, useAppSelector } from '../store';
-import { isInitialized, setIsLoggedIn } from '../store/InitializeReducer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import HomeScreen from '../screens/HomeScreen';
@@ -80,21 +78,19 @@ export const HomeTabs = () => {
 };
 
 export const StackNavigator = () => {
-  const dispatch = useAppDispatch();
-
-  const isLoggedIn = useAppSelector(isInitialized);
+  const [isLogged, setIsLogged] = useState(false);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        dispatch(setIsLoggedIn(true));
+        setIsLogged(true);
       }
     });
   }, []);
 
   return (
     <HomeStack.Navigator>
-      {isLoggedIn ? (
+      {isLogged ? (
         <>
           <HomeStack.Screen
             name={'HomeScreen'}

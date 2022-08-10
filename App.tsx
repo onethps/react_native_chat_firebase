@@ -1,10 +1,9 @@
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
-import { Provider } from 'react-redux';
-import { store } from './src/store';
-import { useContext } from 'react';
+import React, { useContext } from 'react';
 import { StackNavigator } from './src/navigation/StackNavigator';
-import { ThemeContext } from './src/components/ThemeProvider/ThemeProvider';
-import ThemeProvider from './src/components/ThemeProvider/ThemeProvider';
+import ThemeProvider, {
+  ThemeContext,
+} from './src/components/ThemeProvider/ThemeProvider';
 
 const MyDarkTheme = {
   ...DarkTheme,
@@ -36,9 +35,7 @@ const Main = () => {
   const { isDarkTheme } = useContext(ThemeContext);
   return (
     <NavigationContainer theme={isDarkTheme ? MyDarkTheme : MyLightTheme}>
-      <Provider store={store}>
-        <StackNavigator />
-      </Provider>
+      <StackNavigator />
     </NavigationContainer>
   );
 };

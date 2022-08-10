@@ -155,6 +155,7 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
       userId: auth.currentUser?.uid,
       unread: true,
     };
+
     if (currentRoomId) {
       try {
         const newCityRef = doc(collection(db, 'chat', currentRoomId, 'messages'));
@@ -165,7 +166,7 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
           lastMsg: value,
         });
         setValue('');
-      } catch (e) {
+      } catch (e: any) {
         Alert.alert(e);
       }
     }
@@ -194,7 +195,7 @@ const ChatRoomScreen = ({ route }: ChatRoomProps) => {
         });
         setValue('');
         setCurrentRoomId(newRef.id);
-      } catch (e) {
+      } catch (e: any) {
         Alert.alert(e);
       }
     }

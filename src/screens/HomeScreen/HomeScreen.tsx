@@ -1,30 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, StyleSheet, TextInput, View } from 'react-native';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { StyleSheet, TextInput, View, Text, TouchableOpacity } from 'react-native';
+import { collection, deleteDoc, doc, onSnapshot, query, where } from 'firebase/firestore';
 
 import { RoomType } from '../../types';
 import { auth, db } from '../../api';
 import ChatRowItem from '../../components/ChatRowItem';
 import { useTheme } from '@react-navigation/native';
 import { globalThemeTypes } from '../../types/types';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 const HomeScreen = () => {
   const [rooms, setRooms] = useState<RoomType[] | null>(null);
 
   const theme: globalThemeTypes = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
-
-  const chatRowRenderItem = useCallback(
-    ({ item, index }) => (
-      <ChatRowItem
-        item={item}
-        index={index}
-        //last message
-        message={item.lastMsg}
-      />
-    ),
-    [],
-  );
 
   useEffect(() => {
     const q = query(
@@ -41,6 +30,33 @@ const HomeScreen = () => {
     return () => unsubscribe();
   }, []);
 
+  const chatRowRenderItem = useCallback(
+    ({ item, index }) => (
+      <ChatRowItem
+        item={item}
+        index={index}
+        //last message
+        message={item.lastMsg}
+      />
+    ),
+    [],
+  );
+
+  const deleteRoom = async (roomId: string) => {
+    await deleteDoc(doc(db, 'chat', roomId));
+  };
+
+  const renderHiddenItem = (item: RoomType) => (
+    <View style={styles.rowBack}>
+      <TouchableOpacity
+        style={[styles.backRightBtn, styles.backRightBtnRight]}
+        onPress={() => deleteRoom(item.roomId)}
+      >
+        <Text style={styles.backTextWhite}>Delete</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
@@ -51,11 +67,16 @@ const HomeScreen = () => {
         />
       </View>
       {/*HOME PAGE ROOMS LIST*/}
-      <FlatList
+      <SwipeListView
         contentContainerStyle={styles.chatRows}
         data={rooms}
         renderItem={chatRowRenderItem}
         keyExtractor={(item) => item.roomId}
+        renderHiddenItem={({ item }) => renderHiddenItem(item)}
+        rightOpenValue={-75}
+        previewRowKey={'0'}
+        previewOpenValue={-40}
+        previewOpenDelay={3000}
       />
     </View>
   );
@@ -77,7 +98,7 @@ const createStyles = (theme: globalThemeTypes) =>
     input: {
       width: '100%',
       borderRadius: 10,
-      padding: 5,
+      padding: 10,
       textAlign: 'center',
       fontWeight: 'bold',
       fontSize: 18,
@@ -86,6 +107,29 @@ const createStyles = (theme: globalThemeTypes) =>
     },
     chatRows: {
       marginTop: 20,
+    },
+    backTextWhite: {
+      color: '#FFF',
+    },
+    backRightBtn: {
+      alignItems: 'center',
+      bottom: 0,
+      justifyContent: 'center',
+      position: 'absolute',
+      top: 0,
+      width: 75,
+    },
+    backRightBtnRight: {
+      backgroundColor: 'red',
+      right: 0,
+    },
+    rowBack: {
+      alignItems: 'center',
+      backgroundColor: theme.colors.background,
+      flex: 1,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingLeft: 15,
     },
   });
 

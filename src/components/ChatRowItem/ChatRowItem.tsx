@@ -1,11 +1,25 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import Animated, {
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
 import { RoomType, useAppNavigation } from '../../types';
 import { formatDate } from '../../utils/formatDate';
 import { auth, db } from '../../api';
 import { collection, doc, getDoc, onSnapshot, query, where } from 'firebase/firestore';
 import { UserType } from '../../types/types';
 import { Theme, useTheme } from '@react-navigation/native';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 const ChatRowItem = ({
   item,
@@ -75,7 +89,7 @@ const ChatRowItem = ({
   }, []);
 
   return (
-    <TouchableOpacity onPress={onNavToChatRoomPress}>
+    <TouchableHighlight onPress={onNavToChatRoomPress}>
       <View style={styles.container}>
         <View>
           <Image
@@ -101,17 +115,20 @@ const ChatRowItem = ({
           </Text>
         </View>
       </View>
-    </TouchableOpacity>
+    </TouchableHighlight>
   );
 };
 
 const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
+      backgroundColor: theme.colors.background,
       flexDirection: 'row',
       alignItems: 'center',
       paddingVertical: 5,
       paddingHorizontal: 10,
+      justifyContent: 'center',
+      width: '100%',
     },
     avatar: {
       marginRight: 5,
