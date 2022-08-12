@@ -1,31 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Dimensions,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import Animated, {
-  useAnimatedGestureHandler,
-  useAnimatedStyle,
-  useSharedValue,
-} from 'react-native-reanimated';
+import { Image, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
 import { RoomType, useAppNavigation } from '../../types';
 import { formatDate } from '../../utils/formatDate';
 import { auth, db } from '../../api';
 import { collection, doc, getDoc, onSnapshot, query, where } from 'firebase/firestore';
 import { UserType } from '../../types/types';
 import { Theme, useTheme } from '@react-navigation/native';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 const ChatRowItem = ({
-  item,
-  message,
-  index,
-}: {
+                       item,
+                       message,
+                       index,
+                     }: {
   item: RoomType;
   message: any;
   index: number;
@@ -107,7 +93,6 @@ const ChatRowItem = ({
         <View style={styles.textContainer}>
           <View style={styles.headerTextContainer}>
             <Text style={styles.name}>{profileSender?.email}</Text>
-            {/*TODO fix date*/}
             <Text style={{ color: '#9a9a9a' }}>{formatDate(new Date())}</Text>
           </View>
           <Text numberOfLines={2} style={styles.desc}>

@@ -1,8 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, TextInput, View, Text, TouchableOpacity } from 'react-native';
-import { collection, deleteDoc, doc, onSnapshot, query, where } from 'firebase/firestore';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  where,
+} from 'firebase/firestore';
 
-import { RoomType } from '../../types';
+import { RoomType, useAppNavigation } from '../../types';
 import { auth, db } from '../../api';
 import ChatRowItem from '../../components/ChatRowItem';
 import { useTheme } from '@react-navigation/native';
@@ -11,9 +20,11 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 
 const HomeScreen = () => {
   const [rooms, setRooms] = useState<RoomType[] | null>(null);
+  const [allRoomIds, setAllRoomIds] = useState<string[] | null>(null);
 
   const theme: globalThemeTypes = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const nav = useAppNavigation();
 
   useEffect(() => {
     const q = query(
@@ -22,11 +33,15 @@ const HomeScreen = () => {
     );
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       let rooms: RoomType[] = [];
+      let roomIds: string[] = [];
       querySnapshot.forEach((doc) => {
         rooms.push(doc.data() as RoomType);
+        roomIds.push(doc.id as string);
       });
       setRooms(rooms);
+      setAllRoomIds(roomIds);
     });
+
     return () => unsubscribe();
   }, []);
 
@@ -57,10 +72,18 @@ const HomeScreen = () => {
     </View>
   );
 
+  const onNavSearchItems = () => {
+    nav.navigate('Search', {
+      allRoomIds,
+    });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
         <TextInput
+          showSoftInputOnFocus={false}
+          onPressIn={onNavSearchItems}
           placeholderTextColor={theme.colors.inputText}
           style={styles.input}
           placeholder={'Search...'}

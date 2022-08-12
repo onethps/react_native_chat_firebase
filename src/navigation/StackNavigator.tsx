@@ -13,6 +13,7 @@ import ProfileScreen from '../screens/ProfileScreen/ProfileScreen';
 import { useTheme } from '@react-navigation/native';
 import { globalThemeTypes } from '../types/types';
 import { StyleSheet, View } from 'react-native';
+import Search from '../screens/Search';
 
 const HomeStack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -103,6 +104,7 @@ export const StackNavigator = () => {
               }}
             />
             <HomeStack.Screen name={'ChatRoomScreen'} component={ChatRoomScreen} />
+            <HomeStack.Screen name={'Search'} component={Search} />
             <HomeStack.Screen
               name={'ProfileScreen'}
               component={ProfileScreen}

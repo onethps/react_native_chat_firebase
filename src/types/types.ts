@@ -14,6 +14,9 @@ export type RootStackParamList = {
   SignUpScreen: undefined;
   SignInScreen: undefined;
   ProfileScreen: undefined;
+  Search: {
+    allRoomIds: string[] | null;
+  };
 };
 
 export type customColors = {
@@ -29,6 +32,7 @@ export type customColors = {
 export type globalThemeTypes = Theme & customColors;
 
 export type ChatRoomProps = NativeStackScreenProps<RootStackParamList, 'ChatRoomScreen'>;
+export type SearchProps = NativeStackScreenProps<RootStackParamList, 'Search'>;
 
 export type NavigationUseType = NavigationProp<RootStackParamList>;
 export const useAppNavigation = () => useNavigation<NavigationUseType>();
