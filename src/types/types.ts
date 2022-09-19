@@ -16,6 +16,7 @@ export type RootStackParamList = {
   ProfileScreen: undefined;
   Search: {
     allRoomIds: string[] | null;
+    ref_input2: any;
   };
 };
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, TextInput, View, Text, TouchableOpacity } from 'react-native';
 import {
   collection,
@@ -25,6 +25,9 @@ const HomeScreen = () => {
   const theme: globalThemeTypes = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const nav = useAppNavigation();
+
+  const ref_input2 = useRef<TextInput>(null);
+  const ref_input3 = useRef<TextInput>(null);
 
   useEffect(() => {
     const q = query(
@@ -75,6 +78,7 @@ const HomeScreen = () => {
   const onNavSearchItems = () => {
     nav.navigate('Search', {
       allRoomIds,
+      ref_input2,
     });
   };
 
@@ -83,6 +87,7 @@ const HomeScreen = () => {
       <View style={styles.inputContainer}>
         <TextInput
           showSoftInputOnFocus={false}
+          blurOnSubmit={false}
           onPressIn={onNavSearchItems}
           placeholderTextColor={theme.colors.inputText}
           style={styles.input}

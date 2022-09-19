@@ -8,10 +8,10 @@ import { UserType } from '../../types/types';
 import { Theme, useTheme } from '@react-navigation/native';
 
 const ChatRowItem = ({
-                       item,
-                       message,
-                       index,
-                     }: {
+  item,
+  message,
+  index,
+}: {
   item: RoomType;
   message: any;
   index: number;
@@ -19,6 +19,8 @@ const ChatRowItem = ({
   const nav = useAppNavigation();
   const [profileSender, setProfileSender] = useState<UserType | null>(null);
   const [unreadCount, setUnreadCount] = useState<null | number>(null);
+
+  console.log(profileSender);
 
   const theme = useTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
@@ -121,6 +123,7 @@ const createStyles = (theme: Theme) =>
       width: 50,
       height: 50,
       position: 'relative',
+      backgroundImage: 'none',
     },
     unreadMessagesCountContainer: {
       backgroundColor: theme.colors.primary,

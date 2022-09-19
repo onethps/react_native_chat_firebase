@@ -99,5 +99,5 @@ export const firstCharAvatarGenerator = (value: string) => {
   const randomColor = Math.floor(Math.random() * colors.length);
   const firstChar = value[0];
   const currentColor = colors[randomColor].substring(1);
-  return `https://ui-avatars.com/api/?name=${firstChar}&background=${currentColor}&color=FFFFFF`;
+  return `https://ui-avatars.com/api/?name=${firstChar}&background=${currentColor}&color=FFFFFF&format=png`;
 };
